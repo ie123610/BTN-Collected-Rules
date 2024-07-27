@@ -1,42 +1,18 @@
-name: update-iplist
+name: Sync Fork
 
 on:
   schedule:
-    - cron: '*/120 * * * *' # every 120 minutes
+    - cron: '*/60 * * * *' # every 30 minutes
   workflow_dispatch: # on button click
 
 jobs:
+  sync:
 
-  process-IPlist:
-    runs-on: windows-latest
-    
+    runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      
-    - name: Download iplist
-      run: |
-        # 从 URL 下载文本内容
-        $url = "https://raw.githubusercontent.com/PBH-BTN/BTN-Collected-Rules/main/combine/all.txt"
-        $content = Invoke-WebRequest -Uri $url -UseBasicParsing | Select-Object -ExpandProperty Content
-        
-        # 去除注释
-        $cleanedContent = $content -replace "^#.*`n", ""
-        
-        # Base64 编码
-        $base64Content = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($cleanedContent))
-        
-        # 保存到文件
-        Set-Content -Path "BTN-IP-List-all.txt" -Value $base64Content
-      shell: pwsh
-      
-    - name: Commit and Push Changes
-      uses: actions-js/push@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: main
-        message: "Update IPlist"
-        author_email: github-actions[bot]@users.noreply.github.com
-        author_name: github-actions[bot]
-        amend: false
-        directory: .
+      - uses: tgymnich/fork-sync@v2.0.10
+        with:
+          owner: ie123610
+          base: main
+          head: main
